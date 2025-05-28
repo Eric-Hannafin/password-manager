@@ -39,3 +39,4 @@ build/
 passwords.db
 .idea/dataSources.xml
 dependency-reduced-pom.xml
+/.idea

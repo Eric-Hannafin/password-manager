@@ -3,10 +3,7 @@ package passwordmanager.database;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Scanner;
 
 public class Database {
@@ -14,7 +11,6 @@ public class Database {
     private static final String DB_URL = "jdbc:sqlite:passwords.db";
 
     public static void init() {
-        System.out.println("Working directory: " + System.getProperty("user.dir"));
         try(Connection connection = DriverManager.getConnection(DB_URL)){
             System.out.println("Successfully connected to database");
             Statement statement = connection.createStatement();
@@ -38,6 +34,17 @@ public class Database {
             return scanner.useDelimiter("\\A").next();
         } catch (IOException e) {
             throw new RuntimeException("Failed to load SQL from file: " + filename, e);
+        }
+    }
+
+    public static void saveSalt(String username, byte[] salt){
+        String insertSQL = "INSERT INTO salts (username, salt) VALUES (?, ?)";
+        try(Connection connection = connect(); PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+            preparedStatement.setString(1, username);
+            preparedStatement.setBytes(2, salt);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
