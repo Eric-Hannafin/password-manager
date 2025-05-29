@@ -31,7 +31,7 @@ public class AuthenticationService {
         String username = checkUsernameAvailability();
         String password = readPasswords();
         SecurityUtil passwordUtility = new SecurityUtil();
-        byte[] salt = SecurityUtil.generateSalt();
+        String salt = SecurityUtil.generateSalt();
         Database.saveSalt(username, salt);
     }
 

@@ -37,11 +37,11 @@ public class Database {
         }
     }
 
-    public static void saveSalt(String username, byte[] salt){
+    public static void saveSalt(String username, String salt){
         String insertSQL = "INSERT INTO salts (username, salt) VALUES (?, ?)";
         try(Connection connection = connect(); PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             preparedStatement.setString(1, username);
-            preparedStatement.setBytes(2, salt);
+            preparedStatement.setString(2, salt);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
