@@ -3,6 +3,7 @@ package passwordmanager.authentication;
 import passwordmanager.database.Database;
 import passwordmanager.security.SecurityUtil;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class AuthenticationService {
@@ -27,13 +28,23 @@ public class AuthenticationService {
 
     public void registerUser() {
         System.out.println(" ");
-        System.out.println("Please enter a username:");
-        String username = sc.next();  // Add check - username needs to be unique
+        String username = checkUsernameAvailability();
         String password = readPasswords();
         SecurityUtil passwordUtility = new SecurityUtil();
         byte[] salt = SecurityUtil.generateSalt();
         Database.saveSalt(username, salt);
-        //SecurityUtil.generateKey(password, salt);
+    }
+
+    private String checkUsernameAvailability(){
+        while (true){
+            System.out.println("Please enter a username:");
+            String username = sc.next();
+            boolean exists = Database.validateUsername(username);
+            if(!exists){
+                return username;
+            }
+            System.out.println("Username is not available! Please try again.");
+        }
     }
 
     private String readPasswords() {

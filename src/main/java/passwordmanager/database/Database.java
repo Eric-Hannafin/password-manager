@@ -48,4 +48,17 @@ public class Database {
         }
     }
 
+    public static boolean validateUsername(String username) {
+        String sql = "SELECT * FROM salts WHERE username = ?";
+        try {
+            Connection connection = connect();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException("An unexpected error occurred while trying to validate the username");
+        }
+    }
 }

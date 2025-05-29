@@ -6,16 +6,20 @@ import passwordmanager.utility.MenuOption;
 
 public class App {
 
-    public static void main(String[] args) {
-        AuthenticationService authenticationService = new AuthenticationService();
+    private AuthenticationService authenticationService = new AuthenticationService();
+
+    public void run() {
         Database.init();
         String initialResponse = authenticationService.initialDialogue();
         MenuOption option = MenuOption.fromInput(initialResponse);
-        switch (option){
+        switch (option) {
             case LOGIN -> authenticationService.login();
             case REGISTER -> authenticationService.registerUser();
             case EXIT -> System.out.println("Exiting....");
-
         }
+    }
+
+    public static void main(String[] args) {
+        new App().run();
     }
 }
