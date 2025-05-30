@@ -1,7 +1,7 @@
 package passwordmanager;
 
 import passwordmanager.authentication.AuthenticationService;
-import passwordmanager.database.Database;
+import passwordmanager.database.DatabaseUtil;
 import passwordmanager.utility.MenuOption;
 
 public class App {
@@ -9,7 +9,7 @@ public class App {
     private AuthenticationService authenticationService = new AuthenticationService();
 
     public void run() {
-        Database.init();
+        DatabaseUtil.init();
         String initialResponse = authenticationService.initialDialogue();
         MenuOption option = MenuOption.fromInput(initialResponse);
         switch (option) {

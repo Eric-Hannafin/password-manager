@@ -1,49 +1,67 @@
 package passwordmanager.authentication;
 
-import passwordmanager.database.Database;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import passwordmanager.database.DatabaseUtil;
 import passwordmanager.security.SecurityUtil;
+import static passwordmanager.utility.ConsoleUtil.clearConsole;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class AuthenticationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
     private static final Scanner sc = new Scanner(System.in);
+    private static final String HEADER_BORDER = "************************************";
 
     public String initialDialogue(){
-        System.out.println("************************************");
-        System.out.println("***Welcome to the PasswordManager***");
-        System.out.println("************************************");
-        System.out.println(" ");
-        System.out.println("Please select from the below options:");
-        System.out.println("1. Login");
-        System.out.println("2. Register");
-        System.out.println("3. Exit");
+        LOGGER.info(HEADER_BORDER);
+        LOGGER.info("***Welcome to the PasswordManager***");
+        LOGGER.info(HEADER_BORDER);
+        LOGGER.info(" ");
+        LOGGER.info("Please select from the below options:");
+        LOGGER.info("1. Login");
+        LOGGER.info("2. Register");
+        LOGGER.info("3. Exit");
+
+        return sc.next();
+    }
+
+    public String registeredUserDialogue(){
+        LOGGER.info(HEADER_BORDER);
+        LOGGER.info("***Welcome to the PasswordManager***");
+        LOGGER.info(HEADER_BORDER);
+        LOGGER.info(" ");
+        LOGGER.info("Please select from the below options:");
+        LOGGER.info("1. Login");
+        LOGGER.info("3. Exit");
 
         return sc.next();
     }
 
     public void login() {
+        // TODO
     }
 
     public void registerUser() {
-        System.out.println(" ");
+        LOGGER.info(" ");
         String username = checkUsernameAvailability();
-        String password = readPasswords();
-        SecurityUtil passwordUtility = new SecurityUtil();
+        readPasswords();
         String salt = SecurityUtil.generateSalt();
-        Database.saveSalt(username, salt);
+        DatabaseUtil.saveSalt(username, salt);
+        clearConsole();
+        registeredUserDialogue();
     }
 
     private String checkUsernameAvailability(){
         while (true){
-            System.out.println("Please enter a username:");
+            LOGGER.info("Please enter a username:");
             String username = sc.next();
-            boolean exists = Database.validateUsername(username);
+            boolean exists = DatabaseUtil.validateUsername(username);
             if(!exists){
                 return username;
             }
-            System.out.println("Username is not available! Please try again.");
+            LOGGER.info("Username is not available! Please try again.");
         }
     }
 
@@ -52,19 +70,19 @@ public class AuthenticationService {
         String password2;
 
         while (true) {
-            System.out.println("Please enter a password:");
+            LOGGER.info("Please enter a password:");
             password1 = sc.next();
 
-            System.out.println("Please confirm your password:");
+            LOGGER.info("Please confirm your password:");
             password2 = sc.next();
 
             if (password1.equals(password2)) {
                 break;
             } else {
-                System.out.println("Passwords do not match. Try again.");
+                LOGGER.info("Passwords do not match. Try again.");
             }
         }
-        System.out.println("Password accepted.");
+        LOGGER.info("Password accepted.");
         return password1;
     }
 }

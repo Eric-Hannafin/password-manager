@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.Scanner;
 
-public class Database {
+public class DatabaseUtil {
 
     private static final String DB_URL = "jdbc:sqlite:passwords.db";
 
@@ -29,7 +29,7 @@ public class Database {
     }
 
     public static String loadSqlFromResource(String filename) {
-        try (InputStream in = Database.class.getClassLoader().getResourceAsStream(filename);
+        try (InputStream in = DatabaseUtil.class.getClassLoader().getResourceAsStream(filename);
              Scanner scanner = new Scanner(in, StandardCharsets.UTF_8)) {
             return scanner.useDelimiter("\\A").next();
         } catch (IOException e) {
