@@ -3,6 +3,7 @@ package passwordmanager.authentication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import passwordmanager.database.DatabaseService;
+import passwordmanager.exception.DeriveUserKeyException;
 import passwordmanager.exception.ValidateUsernameException;
 import passwordmanager.security.CryptoService;
 import passwordmanager.security.SecurityService;
@@ -38,6 +39,16 @@ public class AuthenticationServiceTest {
         service.createInitialValue("user1", "salt1");
 
         verify(mockDb).saveUserValue("INITIAL_SITE", "user1", "encrypted");
+    }
+
+    @Test
+    void testCreateInitialValue_handlesException() throws Exception {
+        when(mockSec.deriveUserKey(any(), any())).thenThrow(new DeriveUserKeyException("fail", new Exception("fail")));
+
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in));
+        service.createInitialValue("test", "salt");
+
+        // Expect no exception thrown
     }
 
     @Test
@@ -85,5 +96,37 @@ public class AuthenticationServiceTest {
         String result = service.readPasswords();
 
         assertEquals("right", result);
+    }
+
+    @Test
+    void testInitialDialogue_returnsUserChoice() {
+        Scanner input = new Scanner("2\n");
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, input);
+        String choice = service.initialDialogue();
+        assertEquals("2", choice);
+    }
+
+    @Test
+    void testRegisteredUserDialogue_returnsUserChoice() {
+        Scanner input = new Scanner("1\n");
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, input);
+        String choice = service.registeredUserDialogue();
+        assertEquals("1", choice);
+    }
+
+    @Test
+    void testRegisterUser_flowExecution() throws Exception {
+        String input = "newUser\nmyPass\nmyPass\n";
+        Scanner scanner = new Scanner(input);
+
+        when(mockDb.checkIfUserAlreadyExists("newUser")).thenReturn(false);
+        when(mockSec.deriveUserKey(eq("newUser"), anyString())).thenReturn(mock(SecretKey.class));
+        when(mockCrypto.encrypt(anyString(), any())).thenReturn("encryptedVal");
+
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service.registerUser();
+
+        verify(mockDb).saveSalt(eq("newUser"), anyString());
+        verify(mockDb).saveUserValue(eq("INITIAL_SITE"), eq("newUser"), eq("encryptedVal"));
     }
 }
