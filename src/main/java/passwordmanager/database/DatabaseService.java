@@ -3,6 +3,7 @@ package passwordmanager.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import passwordmanager.exception.FailedToLoadSQLResourceException;
+import passwordmanager.exception.InitialUserValueException;
 import passwordmanager.exception.ValidateUsernameException;
 
 import java.io.IOException;
@@ -66,7 +67,18 @@ public class DatabaseService {
         }
     }
 
-    public void saveUserValue(String username, String site, String password) {
+    public String getUserSalt(String username){
+        String sql = "SELECT salt from salts WHERE username = ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.getString("salt");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void saveUserValue(String site, String username, String password) {
         String sql = "INSERT INTO passwords (site, username, password) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, site);
@@ -89,4 +101,21 @@ public class DatabaseService {
             throw new ValidateUsernameException("An unexpected error occurred while trying to validate the username", e);
         }
     }
+
+    public String getUserInitialValue(String username) {
+        String sql = "SELECT password FROM passwords WHERE username = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("password");
+            } else {
+                throw new InitialUserValueException("Failed to get initial value for user: " + username);
+            }
+        } catch (SQLException e) {
+            throw new InitialUserValueException("Failed to get initial value for user: " + username, e);
+        }
+    }
+
+
 }

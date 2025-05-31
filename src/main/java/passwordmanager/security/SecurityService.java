@@ -38,14 +38,14 @@ public class SecurityService {
         return Base64.getEncoder().encodeToString(salt);
     }
 
-    public SecretKey deriveUserKey(String username, String salt) throws DeriveUserKeyException {
+    public SecretKey deriveUserKey(String password, String salt) throws DeriveUserKeyException {
         try {
             byte[] bytes = salt.getBytes();
 
             int iterations = 65536;
             int keyLength = 256;
 
-            KeySpec keyspec = new PBEKeySpec(username.toCharArray(), bytes, iterations, keyLength);
+            KeySpec keyspec = new PBEKeySpec(password.toCharArray(), bytes, iterations, keyLength);
 
             byte[] encoded = secretKeyFactory.generateSecret(keyspec).getEncoded();
 

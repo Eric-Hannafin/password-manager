@@ -3,7 +3,6 @@ package passwordmanager.authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import passwordmanager.database.DatabaseService;
-import passwordmanager.exception.DeriveUserKeyException;
 import passwordmanager.exception.SecretKeyFactoryException;
 import passwordmanager.exception.ValidateUsernameException;
 import passwordmanager.security.CryptoService;
@@ -11,7 +10,6 @@ import passwordmanager.security.SecurityService;
 import passwordmanager.utility.ConsoleUtil;
 
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -64,32 +62,50 @@ public class AuthenticationService {
     }
 
     public void login() {
-        // TODO
+        System.out.println("Please enter your username:");
+        String username = scanner.next();
+
+        System.out.println("Please enter your password:");
+        String password = scanner.next();
+        try {
+            String salt = databaseService.getUserSalt(username);
+            SecretKey userKey = securityService.deriveUserKey(password, salt);
+
+            String encryptedInitial = databaseService.getUserInitialValue(username);
+            String decrypted = cryptoService.decrypt(encryptedInitial, userKey);
+
+            if (INITIAL_SITE_VALUE.equals(decrypted)) {
+                System.out.println("Login successful!");
+            } else {
+                System.out.println("Invalid username or password.");
+            }
+        } catch (Exception e) {
+            System.out.println("Login failed: Invalid username or password.");
+            LOGGER.error("Login error for user {}: {}", username, e.getMessage());
+        }
     }
 
     public void registerUser() {
         System.out.println(" ");
         String username = checkUsernameAvailability();
-        readPasswords();
+        String password = readPasswords(); // ← capture the password here
         String salt = SecurityService.generateSalt();
         databaseService.saveSalt(username, salt);
-        createInitialValue(username, salt);
+        createInitialValue(username, password, salt); // ← pass password
         consoleUtil.clearConsole();
     }
 
-    protected void createInitialValue(String username, String salt) {
+
+    public void createInitialValue(String username, String password, String salt) {
         try {
-            SecretKey derivedUserKey = securityService.deriveUserKey(username, salt);
-            String encryptedValue = cryptoService.encrypt(INITIAL_SITE_VALUE, derivedUserKey);
-            databaseService.saveUserValue(INITIAL_SITE_VALUE, username, encryptedValue);
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error("No such algorithm", e);
-        } catch (DeriveUserKeyException e) {
-            LOGGER.error("Failed to derive the users key", e);
+            SecretKey derivedUserKey = securityService.deriveUserKey(password, salt);
+            String encryptedValue = cryptoService.encrypt("INITIAL_SITE", derivedUserKey);
+            databaseService.saveUserValue("INITIAL_SITE", username, encryptedValue);
         } catch (Exception e) {
-            LOGGER.error("An unexpected error during the encryption process", e);
+            LOGGER.error("Failed during encryption", e);
         }
     }
+
 
     protected String checkUsernameAvailability() {
         while (true){

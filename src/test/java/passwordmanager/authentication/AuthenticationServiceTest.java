@@ -32,11 +32,11 @@ public class AuthenticationServiceTest {
     @Test
     void testCreateInitialValue_encryptionFlow() throws Exception {
         SecretKey mockKey = mock(SecretKey.class);
-        when(mockSec.deriveUserKey("user1", "salt1")).thenReturn(mockKey);
+        when(mockSec.deriveUserKey("pass1", "salt1")).thenReturn(mockKey);
         when(mockCrypto.encrypt("INITIAL_SITE", mockKey)).thenReturn("encrypted");
 
         service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in));
-        service.createInitialValue("user1", "salt1");
+        service.createInitialValue("user1", "pass1", "salt1");
 
         verify(mockDb).saveUserValue("INITIAL_SITE", "user1", "encrypted");
     }
@@ -46,7 +46,7 @@ public class AuthenticationServiceTest {
         when(mockSec.deriveUserKey(any(), any())).thenThrow(new DeriveUserKeyException("fail", new Exception("fail")));
 
         service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in));
-        service.createInitialValue("test", "salt");
+        service.createInitialValue("test", "pass", "salt");
 
         // Expect no exception thrown
     }
@@ -128,5 +128,53 @@ public class AuthenticationServiceTest {
 
         verify(mockDb).saveSalt(eq("newUser"), anyString());
         verify(mockDb).saveUserValue(eq("INITIAL_SITE"), eq("newUser"), eq("encryptedVal"));
+    }
+
+    @Test
+    void testLoginSuccess() throws Exception {
+        Scanner scanner = new Scanner("testuser\ntestpass\n");
+        SecretKey mockKey = mock(SecretKey.class);
+
+        when(mockDb.getUserSalt("testuser")).thenReturn("somesalt");
+        when(mockSec.deriveUserKey("testpass", "somesalt")).thenReturn(mockKey);
+        when(mockDb.getUserInitialValue("testuser")).thenReturn("encryptedValue");
+        when(mockCrypto.decrypt("encryptedValue", mockKey)).thenReturn("INITIAL_SITE");
+
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service.login();
+
+        verify(mockDb).getUserSalt("testuser");
+        verify(mockDb).getUserInitialValue("testuser");
+        verify(mockCrypto).decrypt("encryptedValue", mockKey);
+    }
+
+    @Test
+    void testLoginFailure() throws Exception {
+        Scanner scanner = new Scanner("testuser\ntestpass\n");
+        SecretKey mockKey = mock(SecretKey.class);
+
+        when(mockDb.getUserSalt("testuser")).thenReturn("somesalt");
+        when(mockSec.deriveUserKey("testpass", "somesalt")).thenReturn(mockKey);
+        when(mockDb.getUserInitialValue("testuser")).thenReturn("encryptedValue");
+        when(mockCrypto.decrypt("encryptedValue", mockKey)).thenReturn("WRONG_VALUE");
+
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service.login();
+
+        verify(mockDb).getUserSalt("testuser");
+        verify(mockDb).getUserInitialValue("testuser");
+        verify(mockCrypto).decrypt("encryptedValue", mockKey);
+    }
+
+    @Test
+    void testLoginThrowsException() throws Exception {
+        Scanner scanner = new Scanner("testuser\ntestpass\n");
+
+        when(mockDb.getUserSalt("testuser")).thenThrow(new RuntimeException("DB error"));
+
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service.login();
+
+        verify(mockDb).getUserSalt("testuser");
     }
 }

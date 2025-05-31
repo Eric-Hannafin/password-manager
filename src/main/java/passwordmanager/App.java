@@ -27,8 +27,7 @@ public class App {
         databaseService.init();
         LOGGER.info("Database initialized");
 
-        boolean running = true;
-        while (running) {
+        while (true) {
             String input = authenticationService.initialDialogue();
             MenuOptionEnum option = MenuOptionEnum.fromInput(input);
 
@@ -36,24 +35,19 @@ public class App {
                 case LOGIN -> {
                     authenticationService.login();
                     consoleUtil.clearConsole();
-                    showLoggedInMenu(); // this can also return a flag if needed
+                    showLoggedInMenu();
                 }
                 case REGISTER -> authenticationService.registerUser();
                 case EXIT -> {
                     LOGGER.info("Exiting...");
-                    running = false;
+                    return;
                 }
             }
         }
     }
 
     private void showLoggedInMenu() {
-        boolean loggedIn = true;
-        while (loggedIn) {
             String menuSelection = authenticationService.registeredUserDialogue();
-            System.out.println("HERE");
-            loggedIn = false;
-        }
     }
 
     public static void main(String[] args) throws SQLException {
