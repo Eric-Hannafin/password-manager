@@ -11,14 +11,12 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.Scanner;
 
-public class DatabaseUtil {
+public class DatabaseService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseService.class);
     private static final String DB_URL = "jdbc:sqlite:passwords.db";
 
-    private DatabaseUtil(){}
-
-    public static void init() {
+    public void init() {
         try(Connection connection = connect();
             Statement statement = connection.createStatement()){
             LOGGER.info("Successfully connected to database");
@@ -31,12 +29,12 @@ public class DatabaseUtil {
         }
     }
 
-    public static Connection connect() throws SQLException {
+    public Connection connect() throws SQLException {
         return DriverManager.getConnection(DB_URL);
     }
 
-    public static String loadSqlFromResource(String filename) throws FailedToLoadSQLResourceException {
-        try (InputStream in = DatabaseUtil.class.getClassLoader().getResourceAsStream(filename);
+    public String loadSqlFromResource(String filename) throws FailedToLoadSQLResourceException {
+        try (InputStream in = DatabaseService.class.getClassLoader().getResourceAsStream(filename);
              Scanner scanner = new Scanner(in, StandardCharsets.UTF_8)) {
             return scanner.useDelimiter("\\A").next();
         } catch (IOException e) {
@@ -44,7 +42,7 @@ public class DatabaseUtil {
         }
     }
 
-    public static void saveSalt(String username, String salt){
+    public void saveSalt(String username, String salt){
         String sql = "INSERT INTO salts (username, salt) VALUES (?, ?)";
         try(Connection connection = connect(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, username);
@@ -55,7 +53,7 @@ public class DatabaseUtil {
         }
     }
 
-    public static void saveUserValue(String username, String site, String password){
+    public void saveUserValue(String username, String site, String password){
             String sql = "INSERT INTO passwords (site, username, password) VALUES (?, ?, ?)";
         try(Connection connection = connect();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -69,7 +67,7 @@ public class DatabaseUtil {
         }
     }
 
-    public static boolean checkIfUserAlreadyExists(String username) throws ValidateUsernameException {
+    public boolean checkIfUserAlreadyExists(String username) throws ValidateUsernameException {
         String sql = "SELECT salts.username FROM salts WHERE username = ?";
         try(Connection connection = connect();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

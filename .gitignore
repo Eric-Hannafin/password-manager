@@ -40,3 +40,5 @@ passwords.db
 .idea/dataSources.xml
 dependency-reduced-pom.xml
 /.idea
+passwords.db-journal
+logs/app.log

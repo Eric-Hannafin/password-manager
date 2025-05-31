@@ -1,13 +1,13 @@
 package passwordmanager.utility;
 
-public enum MenuOption {
+public enum MenuOptionEnum {
     LOGIN("1"),
     REGISTER("2"),
     EXIT("3");
 
     private final String code;
 
-    MenuOption(String code) {
+    MenuOptionEnum(String code) {
         this.code = code;
     }
 
@@ -15,8 +15,8 @@ public enum MenuOption {
         return code;
     }
 
-    public static MenuOption fromInput(String input) {
-        for (MenuOption option : values()) {
+    public static MenuOptionEnum fromInput(String input) {
+        for (MenuOptionEnum option : values()) {
             if (option.code.equals(input)) {
                 return option;
             }

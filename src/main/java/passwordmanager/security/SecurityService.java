@@ -1,6 +1,9 @@
 package passwordmanager.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import passwordmanager.exception.DeriveUserKeyException;
+import passwordmanager.exception.SecretKeyFactoryException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -11,9 +14,22 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
-public class SecurityUtil {
+public class SecurityService {
 
-    private SecurityUtil() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
+    private final SecretKeyFactory secretKeyFactory;
+
+    public SecurityService() {
+        try {
+            secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("Failed to create security factory instance", e);
+            throw new SecretKeyFactoryException("Failed to create security factory instance", e);
+        }
+    }
+
+    public SecurityService(SecretKeyFactory secretKeyFactory) {
+        this.secretKeyFactory = secretKeyFactory;
     }
 
     public static String generateSalt(){
@@ -22,7 +38,7 @@ public class SecurityUtil {
         return Base64.getEncoder().encodeToString(salt);
     }
 
-    public static SecretKey deriveUserKey(String username, String salt) throws NoSuchAlgorithmException, DeriveUserKeyException {
+    public SecretKey deriveUserKey(String username, String salt) throws DeriveUserKeyException {
         try {
             byte[] bytes = salt.getBytes();
 
@@ -30,9 +46,8 @@ public class SecurityUtil {
             int keyLength = 256;
 
             KeySpec keyspec = new PBEKeySpec(username.toCharArray(), bytes, iterations, keyLength);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 
-            byte[] encoded = factory.generateSecret(keyspec).getEncoded();
+            byte[] encoded = secretKeyFactory.generateSecret(keyspec).getEncoded();
 
             return new SecretKeySpec(encoded, "AES");
 

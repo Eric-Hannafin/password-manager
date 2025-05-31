@@ -15,3 +15,4 @@
 09:16:27.097 [main] INFO  p.database.DatabaseUtil - Successfully connected to database
 09:16:27.101 [main] INFO  passwordmanager.App - Database initialized
 09:16:36.763 [main] INFO  p.database.DatabaseUtil - Saving user value
+10:24:52.034 [main] INFO  passwordmanager.App - Exiting....

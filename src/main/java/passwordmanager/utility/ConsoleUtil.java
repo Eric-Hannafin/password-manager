@@ -1,6 +1,11 @@
 package passwordmanager.utility;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConsoleUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleUtil.class);
 
     private ConsoleUtil(){}
 

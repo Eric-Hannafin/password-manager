@@ -6,13 +6,13 @@ import javax.crypto.spec.GCMParameterSpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public class CryptoUtil {
+public class CryptoService {
     private static final String AES = "AES";
     private static final String AES_GCM = "AES/GCM/NoPadding";
-    private static final int IV_SIZE = 12; // GCM standard
-    private static final int TAG_LENGTH = 128; // bits
+    private static final int IV_SIZE = 12;
+    private static final int TAG_LENGTH = 128;
 
-    public static String encrypt(String plainText, SecretKey key) throws Exception {
+    public String encrypt(String plainText, SecretKey key) throws Exception {
         Cipher cipher = Cipher.getInstance(AES_GCM);
 
         byte[] iv = new byte[IV_SIZE];
@@ -31,7 +31,7 @@ public class CryptoUtil {
         return Base64.getEncoder().encodeToString(combined);
     }
 
-    public static String decrypt(String encrypted, SecretKey key) throws Exception {
+    public String decrypt(String encrypted, SecretKey key) throws Exception {
         byte[] combined = Base64.getDecoder().decode(encrypted);
 
         byte[] iv = new byte[IV_SIZE];

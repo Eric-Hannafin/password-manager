@@ -2,29 +2,32 @@ package passwordmanager.authentication;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import passwordmanager.database.DatabaseUtil;
+import passwordmanager.database.DatabaseService;
 import passwordmanager.exception.DeriveUserKeyException;
+import passwordmanager.exception.SecretKeyFactoryException;
 import passwordmanager.exception.ValidateUsernameException;
-import passwordmanager.security.SecurityUtil;
+import passwordmanager.security.CryptoService;
+import passwordmanager.security.SecurityService;
 
 import javax.crypto.SecretKey;
-
-import static passwordmanager.utility.ConsoleUtil.clearConsole;
-import static passwordmanager.database.DatabaseUtil.saveSalt;
-import static passwordmanager.database.DatabaseUtil.saveUserValue;
-import static passwordmanager.security.SecurityUtil.deriveUserKey;
-import static passwordmanager.security.CryptoUtil.encrypt;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
+
+import static passwordmanager.utility.ConsoleUtil.clearConsole;
 
 public class AuthenticationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+    private final DatabaseService databaseService = new DatabaseService();
+    private final SecurityService securityService = new SecurityService();
+    private final CryptoService cryptoService = new CryptoService();
+
     private static final String INITIAL_SITE_VALUE = "INITIAL_SITE";
     private static final Scanner sc = new Scanner(System.in);
     private static final String HEADER_BORDER = "************************************";
-    private boolean isUserRegistered = false;
+
+    public AuthenticationService() throws SecretKeyFactoryException {
+    }
 
     public String initialDialogue(){
         System.out.println(HEADER_BORDER);
@@ -59,17 +62,17 @@ public class AuthenticationService {
         System.out.println(" ");
         String username = checkUsernameAvailability();
         readPasswords();
-        String salt = SecurityUtil.generateSalt();
-        saveSalt(username, salt);
+        String salt = SecurityService.generateSalt();
+        databaseService.saveSalt(username, salt);
         createInitialValue(username, salt);
         clearConsole();
     }
 
     private void createInitialValue(String username, String salt) {
         try {
-            SecretKey derivedUserKey = deriveUserKey(username, salt);
-            String encryptedValue = encrypt(INITIAL_SITE_VALUE, derivedUserKey);
-            saveUserValue(INITIAL_SITE_VALUE, username, encryptedValue);
+            SecretKey derivedUserKey = securityService.deriveUserKey(username, salt);
+            String encryptedValue = cryptoService.encrypt(INITIAL_SITE_VALUE, derivedUserKey);
+            databaseService.saveUserValue(INITIAL_SITE_VALUE, username, encryptedValue);
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error("No such algorithm", e);
         } catch (DeriveUserKeyException e) {
@@ -85,7 +88,7 @@ public class AuthenticationService {
             String username = sc.next();
             boolean exists = false;
             try {
-                exists = DatabaseUtil.checkIfUserAlreadyExists(username);
+                exists = databaseService.checkIfUserAlreadyExists(username);
             } catch (ValidateUsernameException e) {
                 LOGGER.error("Failed to validate username", e);
             }

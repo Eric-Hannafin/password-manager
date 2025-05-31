@@ -3,8 +3,8 @@ package passwordmanager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import passwordmanager.authentication.AuthenticationService;
-import passwordmanager.database.DatabaseUtil;
-import passwordmanager.utility.MenuOption;
+import passwordmanager.database.DatabaseService;
+import passwordmanager.utility.MenuOptionEnum;
 
 import static passwordmanager.utility.ConsoleUtil.clearConsole;
 
@@ -12,13 +12,14 @@ public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
     private AuthenticationService authenticationService = new AuthenticationService();
+    private DatabaseService databaseService = new DatabaseService();
 
     public void run() {
-        DatabaseUtil.init();
+        databaseService.init();
         LOGGER.info("Database initialized");
         while (true) {
             String initialResponse = authenticationService.initialDialogue();
-            MenuOption option = MenuOption.fromInput(initialResponse);
+            MenuOptionEnum option = MenuOptionEnum.fromInput(initialResponse);
             switch (option) {
                 case LOGIN -> {
                     authenticationService.login();
