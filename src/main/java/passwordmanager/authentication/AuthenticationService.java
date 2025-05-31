@@ -8,17 +8,17 @@ import passwordmanager.exception.SecretKeyFactoryException;
 import passwordmanager.exception.ValidateUsernameException;
 import passwordmanager.security.CryptoService;
 import passwordmanager.security.SecurityService;
+import passwordmanager.utility.ConsoleUtil;
 
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-import static passwordmanager.utility.ConsoleUtil.clearConsole;
-
 public class AuthenticationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+    private static final ConsoleUtil consoleUtil = new ConsoleUtil();
     private final DatabaseService databaseService;
     private final SecurityService securityService;
     private final CryptoService cryptoService;
@@ -74,7 +74,7 @@ public class AuthenticationService {
         String salt = SecurityService.generateSalt();
         databaseService.saveSalt(username, salt);
         createInitialValue(username, salt);
-        clearConsole();
+        consoleUtil.clearConsole();
     }
 
     protected void createInitialValue(String username, String salt) {
