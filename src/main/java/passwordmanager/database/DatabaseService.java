@@ -49,7 +49,7 @@ public class DatabaseService {
             preparedStatement.setString(2, salt);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("An unexpected error occurred when saving the user salt", e);
         }
     }
 
