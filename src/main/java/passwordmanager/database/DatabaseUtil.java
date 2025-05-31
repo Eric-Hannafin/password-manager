@@ -2,8 +2,8 @@ package passwordmanager.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import passwordmanager.exeption.FailedToLoadSQLResourceException;
-import passwordmanager.exeption.ValidateUsernameException;
+import passwordmanager.exception.FailedToLoadSQLResourceException;
+import passwordmanager.exception.ValidateUsernameException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,13 +45,27 @@ public class DatabaseUtil {
     }
 
     public static void saveSalt(String username, String salt){
-        String insertSQL = "INSERT INTO salts (username, salt) VALUES (?, ?)";
-        try(Connection connection = connect(); PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+        String sql = "INSERT INTO salts (username, salt) VALUES (?, ?)";
+        try(Connection connection = connect(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, salt);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void saveUserValue(String username, String site, String password){
+            String sql = "INSERT INTO passwords (site, username, password) VALUES (?, ?, ?)";
+        try(Connection connection = connect();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, site);
+            preparedStatement.setString(2, username);
+            preparedStatement.setString(3, password);
+            LOGGER.info("Saving user value");
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("An error occurred when trying to save the users value", e);
         }
     }
 

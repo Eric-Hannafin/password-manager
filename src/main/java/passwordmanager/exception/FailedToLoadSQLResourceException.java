@@ -1,4 +1,4 @@
-package passwordmanager.exeption;
+package passwordmanager.exception;
 
 public class FailedToLoadSQLResourceException extends Exception {
 

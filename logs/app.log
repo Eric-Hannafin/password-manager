@@ -2,3 +2,16 @@
 08:04:18.237 [main] INFO  passwordmanager.App - TEST LOG
 08:04:24.754 [main] INFO  passwordmanager.App - TEST LOG
 08:04:26.403 [main] INFO  passwordmanager.App - Exiting....
+09:12:15.253 [main] INFO  p.database.DatabaseUtil - Successfully connected to database
+09:12:15.258 [main] INFO  passwordmanager.App - Database initialized
+09:13:15.447 [main] INFO  passwordmanager.App - Exiting....
+09:13:25.695 [main] INFO  p.database.DatabaseUtil - Successfully connected to database
+09:13:25.700 [main] INFO  passwordmanager.App - Database initialized
+09:15:06.574 [main] INFO  passwordmanager.App - Exiting....
+09:15:16.455 [main] INFO  p.database.DatabaseUtil - Successfully connected to database
+09:15:16.458 [main] INFO  passwordmanager.App - Database initialized
+09:15:29.840 [main] INFO  p.database.DatabaseUtil - Saving user value
+09:16:12.374 [main] INFO  passwordmanager.App - Exiting....
+09:16:27.097 [main] INFO  p.database.DatabaseUtil - Successfully connected to database
+09:16:27.101 [main] INFO  passwordmanager.App - Database initialized
+09:16:36.763 [main] INFO  p.database.DatabaseUtil - Saving user value

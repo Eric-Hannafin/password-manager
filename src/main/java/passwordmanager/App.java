@@ -15,8 +15,8 @@ public class App {
 
     public void run() {
         DatabaseUtil.init();
+        LOGGER.info("Database initialized");
         while (true) {
-            LOGGER.info("TEST LOG");
             String initialResponse = authenticationService.initialDialogue();
             MenuOption option = MenuOption.fromInput(initialResponse);
             switch (option) {

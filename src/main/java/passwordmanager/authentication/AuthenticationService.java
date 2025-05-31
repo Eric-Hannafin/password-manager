@@ -3,17 +3,25 @@ package passwordmanager.authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import passwordmanager.database.DatabaseUtil;
-import passwordmanager.exeption.ValidateUsernameException;
+import passwordmanager.exception.DeriveUserKeyException;
+import passwordmanager.exception.ValidateUsernameException;
 import passwordmanager.security.SecurityUtil;
 
-import static passwordmanager.utility.ConsoleUtil.clearConsole;
-import static passwordmanager.database.DatabaseUtil.checkIfUserAlreadyExists;
+import javax.crypto.SecretKey;
 
+import static passwordmanager.utility.ConsoleUtil.clearConsole;
+import static passwordmanager.database.DatabaseUtil.saveSalt;
+import static passwordmanager.database.DatabaseUtil.saveUserValue;
+import static passwordmanager.security.SecurityUtil.deriveUserKey;
+import static passwordmanager.security.CryptoUtil.encrypt;
+
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 public class AuthenticationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+    private static final String INITIAL_SITE_VALUE = "INITIAL_SITE";
     private static final Scanner sc = new Scanner(System.in);
     private static final String HEADER_BORDER = "************************************";
     private boolean isUserRegistered = false;
@@ -52,9 +60,23 @@ public class AuthenticationService {
         String username = checkUsernameAvailability();
         readPasswords();
         String salt = SecurityUtil.generateSalt();
-        DatabaseUtil.saveSalt(username, salt);
+        saveSalt(username, salt);
+        createInitialValue(username, salt);
         clearConsole();
-        isUserRegistered = true;
+    }
+
+    private void createInitialValue(String username, String salt) {
+        try {
+            SecretKey derivedUserKey = deriveUserKey(username, salt);
+            String encryptedValue = encrypt(INITIAL_SITE_VALUE, derivedUserKey);
+            saveUserValue(INITIAL_SITE_VALUE, username, encryptedValue);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("No such algorithm", e);
+        } catch (DeriveUserKeyException e) {
+            LOGGER.error("Failed to derive the users key", e);
+        } catch (Exception e) {
+            LOGGER.error("An unexpected error during the encryption process", e);
+        }
     }
 
     private String checkUsernameAvailability() {
