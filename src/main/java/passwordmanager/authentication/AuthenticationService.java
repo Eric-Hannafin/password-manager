@@ -2,12 +2,12 @@ package passwordmanager.authentication;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import passwordmanager.CryptoService;
+import passwordmanager.SecurityService;
 import passwordmanager.database.DatabaseService;
 import passwordmanager.exception.DeriveUserKeyException;
 import passwordmanager.exception.SecretKeyFactoryException;
 import passwordmanager.exception.ValidateUsernameException;
-import passwordmanager.security.CryptoService;
-import passwordmanager.security.SecurityService;
 
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;

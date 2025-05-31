@@ -1,4 +1,4 @@
-package passwordmanager.security;
+package passwordmanager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

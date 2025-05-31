@@ -1,8 +1,7 @@
-package passwordmanager.security.utility;
+package passwordmanager.utility;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import passwordmanager.utility.MenuOptionEnum;
 
 class MenuOptionEnumTest {
 
