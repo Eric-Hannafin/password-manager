@@ -1,0 +1,4 @@
+08:04:18.233 [main] INFO  p.database.DatabaseUtil - Successfully connected to database
+08:04:18.237 [main] INFO  passwordmanager.App - TEST LOG
+08:04:24.754 [main] INFO  passwordmanager.App - TEST LOG
+08:04:26.403 [main] INFO  passwordmanager.App - Exiting....

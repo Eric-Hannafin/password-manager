@@ -33,11 +33,12 @@ public class AuthenticationService {
 
     public String registeredUserDialogue(){
         System.out.println(HEADER_BORDER);
-        System.out.println("***TEST OPTIONS");
+        System.out.println("***PasswordManager***");
         System.out.println(HEADER_BORDER);
         System.out.println(" ");
         System.out.println("Please select from the below options:");
-        System.out.println("1. ADD NEW SITE");
+        System.out.println("1. Add new site");
+        System.out.println("1. Retrieve password");
         System.out.println("3. Exit");
         return sc.next();
     }

@@ -16,6 +16,7 @@ public class App {
     public void run() {
         DatabaseUtil.init();
         while (true) {
+            LOGGER.info("TEST LOG");
             String initialResponse = authenticationService.initialDialogue();
             MenuOption option = MenuOption.fromInput(initialResponse);
             switch (option) {
@@ -41,7 +42,7 @@ public class App {
         while (true) {
             String menuSelection = authenticationService.registeredUserDialogue();
             System.out.println("HERE");
-            return;
+            System.exit(1);
         }
     }
 }
