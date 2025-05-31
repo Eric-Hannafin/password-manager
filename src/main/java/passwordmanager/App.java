@@ -6,6 +6,8 @@ import passwordmanager.authentication.AuthenticationService;
 import passwordmanager.database.DatabaseService;
 import passwordmanager.utility.MenuOptionEnum;
 
+import java.sql.SQLException;
+
 import static passwordmanager.utility.ConsoleUtil.clearConsole;
 
 public class App {
@@ -13,6 +15,9 @@ public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
     private AuthenticationService authenticationService = new AuthenticationService();
     private DatabaseService databaseService = new DatabaseService();
+
+    public App() throws SQLException {
+    }
 
     public void run() {
         databaseService.init();
@@ -35,7 +40,7 @@ public class App {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         new App().run();
     }
 

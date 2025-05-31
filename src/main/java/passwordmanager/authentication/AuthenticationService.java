@@ -11,6 +11,7 @@ import passwordmanager.security.SecurityService;
 
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import static passwordmanager.utility.ConsoleUtil.clearConsole;
@@ -26,7 +27,7 @@ public class AuthenticationService {
     private static final String INITIAL_SITE_VALUE = "INITIAL_SITE";
     private static final String HEADER_BORDER = "************************************";
 
-    public AuthenticationService() throws SecretKeyFactoryException {
+    public AuthenticationService() throws SecretKeyFactoryException, SQLException {
         this(new DatabaseService(), new SecurityService(), new CryptoService(), new Scanner(System.in));
     }
 
