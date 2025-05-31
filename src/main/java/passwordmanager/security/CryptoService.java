@@ -1,4 +1,4 @@
-package passwordmanager;
+package passwordmanager.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

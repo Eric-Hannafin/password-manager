@@ -1,7 +1,6 @@
 package passwordmanager.security;
 
 import org.junit.jupiter.api.Test;
-import passwordmanager.SecurityService;
 import passwordmanager.exception.DeriveUserKeyException;
 
 import javax.crypto.SecretKey;

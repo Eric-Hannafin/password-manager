@@ -2,7 +2,6 @@ package passwordmanager.security;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import passwordmanager.CryptoService;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
