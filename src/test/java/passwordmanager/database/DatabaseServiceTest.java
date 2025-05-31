@@ -22,24 +22,24 @@ public class DatabaseServiceTest {
 
     @Test
     void testSaveAndCheckUserExists() throws Exception {
-        databaseService.saveSalt("alice", "salt123");
-        assertTrue(databaseService.checkIfUserAlreadyExists("alice"));
+        databaseService.saveSalt("testName1", "salt123");
+        assertTrue(databaseService.checkIfUserAlreadyExists("testName1"));
     }
 
     @Test
     void testUserDoesNotExistInitially() throws Exception {
-        assertFalse(databaseService.checkIfUserAlreadyExists("bob"));
+        assertFalse(databaseService.checkIfUserAlreadyExists("testName2"));
     }
 
     @Test
     void testSaveUserValueSuccessfully() {
         // This test just ensures that saving doesn't throw an exception.
-        assertDoesNotThrow(() -> databaseService.saveUserValue("alice", "gmail", "encryptedPass"));
+        assertDoesNotThrow(() -> databaseService.saveUserValue("testName1", "gmail", "encryptedPass"));
     }
 
     @Test
     void testSaveSaltDoesNotThrow() {
-        assertDoesNotThrow(() -> databaseService.saveSalt("charlie", "somesalt"));
+        assertDoesNotThrow(() -> databaseService.saveSalt("testName3", "somesalt"));
     }
 
     @Test
