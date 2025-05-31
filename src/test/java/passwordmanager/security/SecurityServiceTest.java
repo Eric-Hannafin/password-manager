@@ -28,7 +28,7 @@ public class SecurityServiceTest {
         String salt = SecurityService.generateSalt();
         assertEquals(EXPECTED_SALT_LENGTH, salt.length());
     }
-
+    // trigger build
     @Test
     public void testSaltValuesAreUnique(){
         String salt1 = SecurityService.generateSalt();
