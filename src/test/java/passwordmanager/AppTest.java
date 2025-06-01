@@ -52,7 +52,7 @@ class AppTest {
 
         verify(mockAuthService, times(2)).initialDialogue();
         verify(mockAuthService, times(1)).login();
-        verify(mockConsoleUtil, times(4)).clearConsole();
+        verify(mockConsoleUtil, times(6)).clearConsole();
     }
 
 
