@@ -11,11 +11,11 @@ import passwordmanager.utility.LoggedInMenuOptionEnum;
 import passwordmanager.utility.MenuOptionEnum;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
-    private static final int EXIT_CODE = 1;
 
     private final AuthenticationService authenticationService;
     private final UserActionService userActionService;
@@ -34,6 +34,7 @@ public class App {
         LOGGER.info("Database initialized");
 
         while (true) {
+            consoleUtil.clearConsole();
             String input = authenticationService.initialDialogue();
             MenuOptionEnum option = MenuOptionEnum.fromInput(input);
 
@@ -56,6 +57,7 @@ public class App {
     private void showLoggedInMenu(UserSession userSession) {
 
         while (true) {
+            consoleUtil.clearConsole();
             String input = authenticationService.registeredUserDialogue();
             LoggedInMenuOptionEnum option = LoggedInMenuOptionEnum.fromInput(input);
             switch (option) {
@@ -63,7 +65,14 @@ public class App {
                     consoleUtil.clearConsole();
                     userActionService.addValue(userSession);
                 }
-                case RETRIEVE -> System.out.println();
+                case RETRIEVE -> {
+                    String sitePassword = userActionService.getUserPassword(userSession);
+                    consoleUtil.clearConsole();
+                    System.out.println("Your password is: " + sitePassword);
+                    System.out.print("Press Enter to return to the menu...");
+                    new Scanner(System.in).nextLine();
+                }
+                case UPDATE -> System.out.println();
                 case LIST -> System.out.println();
                 case DELETE -> System.out.println();
                 case EXIT -> {

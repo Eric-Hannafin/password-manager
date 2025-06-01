@@ -46,13 +46,13 @@ class AppTest {
     void testRun_LoginFlowOnce() {
         when(mockAuthService.initialDialogue()).thenReturn("1", "3");
         when(mockAuthService.login()).thenReturn(new UserSession("testName", mockSecurityKey));
-        when(mockAuthService.registeredUserDialogue()).thenReturn("3", "5");
+        when(mockAuthService.registeredUserDialogue()).thenReturn("4", "6");
 
         app.run();
 
         verify(mockAuthService, times(2)).initialDialogue();
         verify(mockAuthService, times(1)).login();
-        verify(mockConsoleUtil, times(2)).clearConsole();
+        verify(mockConsoleUtil, times(4)).clearConsole();
     }
 
 

@@ -4,9 +4,10 @@ public enum LoggedInMenuOptionEnum {
 
     ADD("1"),
     RETRIEVE("2"),
-    LIST("3"),
-    DELETE("4"),
-    EXIT("5");
+    UPDATE("3"),
+    LIST("4"),
+    DELETE("5"),
+    EXIT("6");
 
     private final String code;
 

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import passwordmanager.exception.FailedToLoadSQLResourceException;
 import passwordmanager.exception.InitialUserValueException;
 import passwordmanager.exception.ValidateUsernameException;
+import passwordmanager.security.UserSession;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,5 +118,25 @@ public class DatabaseService {
         }
     }
 
+    public String getUserSitePassword(String site) {
+        String sql = "SELECT password FROM passwords WHERE site = ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql) ) {
+            preparedStatement.setString(1, site);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.getString("password");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public boolean checkIfSiteAlreadyExists(String site, UserSession userSession){
+        String sql = "SELECT site from passwords WHERE site = ?";
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, site);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

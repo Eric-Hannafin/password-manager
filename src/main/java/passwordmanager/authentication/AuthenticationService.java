@@ -39,7 +39,7 @@ public class AuthenticationService {
 
     public String initialDialogue(){
         System.out.println(HEADER_BORDER);
-        System.out.println("** Welcome to the PasswordManager **");
+        System.out.println("***        PasswordManager        ***");
         System.out.println(HEADER_BORDER);
         System.out.println(" ");
         System.out.println("Please select from the below options:");
@@ -58,16 +58,19 @@ public class AuthenticationService {
         System.out.println("Please select from the below options:");
         System.out.println("1. Add new site");
         System.out.println("2. Retrieve a password");
-        System.out.println("3. List current sites");
-        System.out.println("4. Delete a site");
-        System.out.println("5. Exit");
+        System.out.println("3. Update a password");
+        System.out.println("4. List current sites");
+        System.out.println("5. Delete a site");
+        System.out.println("6. Exit");
         return scanner.next();
     }
 
     public UserSession login() {
+        System.out.println(" ");
         System.out.println("Please enter your username:");
         String username = scanner.next();
 
+        System.out.println(" ");
         System.out.println("Please enter your password:");
         String password = scanner.next();
         try {
