@@ -3,6 +3,7 @@ package passwordmanager.utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("squid:S106")
 public class ConsoleUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleUtil.class);
