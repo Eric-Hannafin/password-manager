@@ -7,6 +7,7 @@ import passwordmanager.exception.SecretKeyFactoryException;
 import passwordmanager.exception.ValidateUsernameException;
 import passwordmanager.security.CryptoService;
 import passwordmanager.security.SecurityService;
+import passwordmanager.security.UserSession;
 import passwordmanager.utility.ConsoleUtil;
 
 import javax.crypto.SecretKey;
@@ -38,7 +39,7 @@ public class AuthenticationService {
 
     public String initialDialogue(){
         System.out.println(HEADER_BORDER);
-        System.out.println("***Welcome to the PasswordManager***");
+        System.out.println("** Welcome to the PasswordManager **");
         System.out.println(HEADER_BORDER);
         System.out.println(" ");
         System.out.println("Please select from the below options:");
@@ -51,17 +52,19 @@ public class AuthenticationService {
 
     public String registeredUserDialogue(){
         System.out.println(HEADER_BORDER);
-        System.out.println("***PasswordManager***");
+        System.out.println("***        PasswordManager        ***");
         System.out.println(HEADER_BORDER);
         System.out.println(" ");
         System.out.println("Please select from the below options:");
         System.out.println("1. Add new site");
-        System.out.println("1. Retrieve password");
-        System.out.println("3. Exit");
+        System.out.println("2. Retrieve a password");
+        System.out.println("3. List current sites");
+        System.out.println("4. Delete a site");
+        System.out.println("5. Exit");
         return scanner.next();
     }
 
-    public void login() {
+    public UserSession login() {
         System.out.println("Please enter your username:");
         String username = scanner.next();
 
@@ -76,6 +79,7 @@ public class AuthenticationService {
 
             if (INITIAL_SITE_VALUE.equals(decrypted)) {
                 System.out.println("Login successful!");
+                return new UserSession(username, userKey);
             } else {
                 System.out.println("Invalid username or password.");
             }
@@ -83,6 +87,7 @@ public class AuthenticationService {
             System.out.println("Login failed: Invalid username or password.");
             LOGGER.error("Login error for user {}: {}", username, e.getMessage());
         }
+        return null;
     }
 
     public void registerUser() {

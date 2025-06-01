@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import passwordmanager.authentication.AuthenticationService;
 import passwordmanager.database.DatabaseService;
+import passwordmanager.security.UserSession;
+import passwordmanager.user.UserActionService;
 import passwordmanager.utility.ConsoleUtil;
+import passwordmanager.utility.LoggedInMenuOptionEnum;
 import passwordmanager.utility.MenuOptionEnum;
 
 import java.sql.SQLException;
@@ -12,15 +15,18 @@ import java.sql.SQLException;
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static final int EXIT_CODE = 1;
 
     private final AuthenticationService authenticationService;
+    private final UserActionService userActionService;
     private final DatabaseService databaseService;
     private final ConsoleUtil consoleUtil;
 
-    public App(AuthenticationService authService, DatabaseService dbService, ConsoleUtil consoleUtil) {
+    public App(AuthenticationService authService, DatabaseService dbService, ConsoleUtil consoleUtil, UserActionService userActionService) {
         this.authenticationService = authService;
         this.databaseService = dbService;
         this.consoleUtil = consoleUtil;
+        this.userActionService = userActionService;
     }
 
     public void run() {
@@ -33,25 +39,44 @@ public class App {
 
             switch (option) {
                 case LOGIN -> {
-                    authenticationService.login();
+                    UserSession userSession = authenticationService.login();
                     consoleUtil.clearConsole();
-                    showLoggedInMenu();
+                    showLoggedInMenu(userSession);
                 }
                 case REGISTER -> authenticationService.registerUser();
                 case EXIT -> {
                     LOGGER.info("Exiting...");
                     return;
                 }
+                default -> throw new IllegalArgumentException("Invalid input: " + input);
             }
         }
     }
 
-    private void showLoggedInMenu() {
-            String menuSelection = authenticationService.registeredUserDialogue();
+    private void showLoggedInMenu(UserSession userSession) {
+
+        while (true) {
+            String input = authenticationService.registeredUserDialogue();
+            LoggedInMenuOptionEnum option = LoggedInMenuOptionEnum.fromInput(input);
+            switch (option) {
+                case ADD -> {
+                    consoleUtil.clearConsole();
+                    userActionService.addValue(userSession);
+                }
+                case RETRIEVE -> System.out.println();
+                case LIST -> System.out.println();
+                case DELETE -> System.out.println();
+                case EXIT -> {
+                    consoleUtil.clearConsole();
+                    return;
+                }
+                default -> throw new IllegalArgumentException("Invalid input " + input);
+            }
+        }
     }
 
     public static void main(String[] args) throws SQLException {
-        App app = new App(new AuthenticationService(), new DatabaseService(), new ConsoleUtil());
+        App app = new App(new AuthenticationService(), new DatabaseService(), new ConsoleUtil(), new UserActionService());
         app.run();
     }
 }
