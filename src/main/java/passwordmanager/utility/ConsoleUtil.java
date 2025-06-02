@@ -2,6 +2,9 @@ package passwordmanager.utility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import passwordmanager.exception.ClearConsoleException;
+
+import java.io.IOException;
 
 @SuppressWarnings("squid:S106")
 public class ConsoleUtil {
@@ -13,36 +16,45 @@ public class ConsoleUtil {
         String os = System.getProperty("os.name").toLowerCase();
 
         try {
-            String term = System.getenv("TERM");
-            if (term != null && term.toLowerCase().contains("xterm")) {
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
+            if (isXtermTerminal()) {
+                clearXtermConsole();
                 return;
             }
 
             if (os.contains("windows")) {
-                try {
-                    new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", "/c", "cls")
-                            .inheritIO()
-                            .start()
-                            .waitFor();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw ie;
-                }
+                clearWindowsConsole();
             } else {
-                try {
-                    new ProcessBuilder("/usr/bin/clear")
-                            .inheritIO()
-                            .start()
-                            .waitFor();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw ie;
-                }
+                clearUnixConsole();
             }
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new ClearConsoleException("Console clearing was interrupted", ie);
         } catch (Exception e) {
             LOGGER.error("An error occurred while trying to clear the console", e);
         }
+    }
+
+    private boolean isXtermTerminal() {
+        String term = System.getenv("TERM");
+        return term != null && term.toLowerCase().contains("xterm");
+    }
+
+    private void clearXtermConsole() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    private void clearWindowsConsole() throws InterruptedException, IOException {
+        new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", "/c", "cls")
+                .inheritIO()
+                .start()
+                .waitFor();
+    }
+
+    private void clearUnixConsole() throws InterruptedException, IOException {
+        new ProcessBuilder("/usr/bin/clear")
+                .inheritIO()
+                .start()
+                .waitFor();
     }
 }
