@@ -9,6 +9,7 @@ import passwordmanager.security.CryptoService;
 import passwordmanager.security.SecurityService;
 
 import javax.crypto.SecretKey;
+import java.io.Console;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +21,7 @@ public class AuthenticationServiceTest {
     private SecurityService mockSec;
     private CryptoService mockCrypto;
     private Scanner mockScanner;
+    private Console mockConsole;
     private AuthenticationService service;
 
     @BeforeEach
@@ -27,6 +29,7 @@ public class AuthenticationServiceTest {
         mockDb = mock(DatabaseService.class);
         mockSec = mock(SecurityService.class);
         mockCrypto = mock(CryptoService.class);
+        mockConsole = mock(Console.class);
     }
 
     @Test
@@ -35,7 +38,7 @@ public class AuthenticationServiceTest {
         when(mockSec.deriveUserKey("pass1", "salt1")).thenReturn(mockKey);
         when(mockCrypto.encrypt("INITIAL_SITE", mockKey)).thenReturn("encrypted");
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in));
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in), mockConsole);
         service.createInitialValue("user1", "pass1", "salt1");
 
         verify(mockDb).saveUserValue("INITIAL_SITE", "user1", "encrypted");
@@ -45,7 +48,7 @@ public class AuthenticationServiceTest {
     void testCreateInitialValue_handlesException() throws Exception {
         when(mockSec.deriveUserKey(any(), any())).thenThrow(new DeriveUserKeyException("fail", new Exception("fail")));
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in));
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, new Scanner(System.in), mockConsole);
         service.createInitialValue("test", "pass", "salt");
 
         // Expect no exception thrown
@@ -57,7 +60,7 @@ public class AuthenticationServiceTest {
         mockScanner = new Scanner(input);
         when(mockDb.checkIfUserAlreadyExists("user123")).thenReturn(false);
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner, mockConsole);
         String result = service.checkUsernameAvailability();
 
         assertEquals("user123", result);
@@ -70,7 +73,7 @@ public class AuthenticationServiceTest {
         when(mockDb.checkIfUserAlreadyExists("taken")).thenReturn(true);
         when(mockDb.checkIfUserAlreadyExists("userX")).thenReturn(false);
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner, mockConsole);
         String result = service.checkUsernameAvailability();
 
         assertEquals("userX", result);
@@ -81,7 +84,7 @@ public class AuthenticationServiceTest {
         String input = "pass1\npass1\n";
         mockScanner = new Scanner(input);
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner, mockConsole);
         String result = service.readPasswords();
 
         assertEquals("pass1", result);
@@ -92,7 +95,7 @@ public class AuthenticationServiceTest {
         String input = "wrong\nnope\nright\nright\n";
         mockScanner = new Scanner(input);
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, mockScanner, mockConsole);
         String result = service.readPasswords();
 
         assertEquals("right", result);
@@ -101,7 +104,7 @@ public class AuthenticationServiceTest {
     @Test
     void testInitialDialogue_returnsUserChoice() {
         Scanner input = new Scanner("2\n");
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, input);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, input, mockConsole);
         String choice = service.initialDialogue();
         assertEquals("2", choice);
     }
@@ -109,7 +112,7 @@ public class AuthenticationServiceTest {
     @Test
     void testRegisteredUserDialogue_returnsUserChoice() {
         Scanner input = new Scanner("1\n");
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, input);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, input, mockConsole);
         String choice = service.registeredUserDialogue();
         assertEquals("1", choice);
     }
@@ -123,7 +126,7 @@ public class AuthenticationServiceTest {
         when(mockSec.deriveUserKey(eq("newUser"), anyString())).thenReturn(mock(SecretKey.class));
         when(mockCrypto.encrypt(anyString(), any())).thenReturn("encryptedVal");
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner, mockConsole);
         service.registerUser();
 
         verify(mockDb).saveSalt(eq("newUser"), anyString());
@@ -132,15 +135,17 @@ public class AuthenticationServiceTest {
 
     @Test
     void testLoginSuccess() throws Exception {
-        Scanner scanner = new Scanner("testuser\ntestpass\n");
-        SecretKey mockKey = mock(SecretKey.class);
+        Scanner scanner = new Scanner("testuser\n");
+        Console mockConsole = mock(Console.class);
+        when(mockConsole.readPassword()).thenReturn("testpass".toCharArray());
 
+        SecretKey mockKey = mock(SecretKey.class);
         when(mockDb.getUserSalt("testuser")).thenReturn("somesalt");
         when(mockSec.deriveUserKey("testpass", "somesalt")).thenReturn(mockKey);
         when(mockDb.getUserInitialValue("testuser")).thenReturn("encryptedValue");
         when(mockCrypto.decrypt("encryptedValue", mockKey)).thenReturn("INITIAL_SITE");
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner, mockConsole);
         service.login();
 
         verify(mockDb).getUserSalt("testuser");
@@ -148,17 +153,20 @@ public class AuthenticationServiceTest {
         verify(mockCrypto).decrypt("encryptedValue", mockKey);
     }
 
+
     @Test
     void testLoginFailure() throws Exception {
-        Scanner scanner = new Scanner("testuser\ntestpass\n");
-        SecretKey mockKey = mock(SecretKey.class);
+        Scanner scanner = new Scanner("testuser\n");
+        Console mockConsole = mock(Console.class);
+        when(mockConsole.readPassword()).thenReturn("testpass".toCharArray());
 
+        SecretKey mockKey = mock(SecretKey.class);
         when(mockDb.getUserSalt("testuser")).thenReturn("somesalt");
         when(mockSec.deriveUserKey("testpass", "somesalt")).thenReturn(mockKey);
         when(mockDb.getUserInitialValue("testuser")).thenReturn("encryptedValue");
         when(mockCrypto.decrypt("encryptedValue", mockKey)).thenReturn("WRONG_VALUE");
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner, mockConsole);
         service.login();
 
         verify(mockDb).getUserSalt("testuser");
@@ -166,13 +174,16 @@ public class AuthenticationServiceTest {
         verify(mockCrypto).decrypt("encryptedValue", mockKey);
     }
 
+
     @Test
     void testLoginThrowsException() throws Exception {
-        Scanner scanner = new Scanner("testuser\ntestpass\n");
+        Scanner scanner = new Scanner("testuser\n");
+        Console mockConsole = mock(Console.class);
+        when(mockConsole.readPassword()).thenReturn("testpass".toCharArray());
 
         when(mockDb.getUserSalt("testuser")).thenThrow(new RuntimeException("DB error"));
 
-        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner);
+        service = new AuthenticationService(mockDb, mockSec, mockCrypto, scanner, mockConsole);
         service.login();
 
         verify(mockDb).getUserSalt("testuser");
