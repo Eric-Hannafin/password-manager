@@ -67,7 +67,8 @@ public class App {
             consoleUtil.clearConsole();
             String input = authenticationService.registeredUserDialogue();
             LoggedInMenuOptionEnum option = LoggedInMenuOptionEnum.fromInput(input);
-            switch (option) {
+            System.out.println(option);
+            switch (Objects.requireNonNull(option)) {
                 case ADD -> {
                     consoleUtil.clearConsole();
                     userActionService.addValue(userSession);
@@ -80,8 +81,11 @@ public class App {
                     new Scanner(System.in).nextLine();
                 }
                 case UPDATE -> System.out.println();
-                case LIST -> System.out.println();
-                case DELETE -> System.out.println();
+                case LIST -> {
+                    userActionService.listAllUserSites(userSession);
+                    new Scanner(System.in).nextLine();
+                }
+                case DELETE -> System.out.println("HERE");
                 case EXIT -> {
                     consoleUtil.clearConsole();
                     return;

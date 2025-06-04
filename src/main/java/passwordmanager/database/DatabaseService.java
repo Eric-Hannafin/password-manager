@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class DatabaseService {
@@ -139,4 +141,19 @@ public class DatabaseService {
             throw new RuntimeException(e);
         }
     }
+
+    public List<String> listAllUserSites(UserSession userSession) throws SQLException {
+        List<String> sites = new ArrayList<>();
+        String sql = "SELECT site FROM passwords WHERE username = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, userSession.username());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    sites.add(resultSet.getString("site"));
+                }
+            }
+        }
+        return sites;
+    }
+
 }

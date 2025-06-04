@@ -8,6 +8,7 @@ import passwordmanager.security.UserSession;
 import passwordmanager.utility.ConsoleUtil;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserActionService {
@@ -15,7 +16,6 @@ public class UserActionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserActionService.class);
 
     private final DatabaseService databaseService;
-    private final ConsoleUtil consoleUtil;
     private final CryptoService cryptoService;
     private final Scanner scanner;
 
@@ -24,7 +24,6 @@ public class UserActionService {
         this.databaseService = databaseService;
         this.cryptoService = cryptoService;
         this.scanner = scanner;
-        this.consoleUtil = consoleUtil;
     }
 
     public UserActionService() throws SQLException {
@@ -56,7 +55,8 @@ public class UserActionService {
             try {
                 String encryptedPassword = cryptoService.encrypt(password, userSession.userKey());
                 databaseService.saveUserValue(site, userSession.username(), encryptedPassword);
-                System.out.println("Password saved successfully.");
+                System.out.println("Password saved successfully. Press enter to return to the main menu");
+                new Scanner(System.in).nextLine();
                 return;
             } catch (Exception e) {
                 System.out.println("Failed to encrypt and save the password.");
@@ -82,5 +82,19 @@ public class UserActionService {
             throw new RuntimeException(e);
         }
     }
+
+    public void listAllUserSites(UserSession userSession) {
+        try {
+            List<String> sites = databaseService.listAllUserSites(userSession);
+            int i = 1;
+            for (String site : sites) {
+                System.out.println(i + ": " + site);
+                i++;
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to retrieve user sites", e);
+        }
+    }
+
 
 }
