@@ -8,7 +8,7 @@ import passwordmanager.exception.ValidateUsernameException;
 import passwordmanager.security.CryptoService;
 import passwordmanager.security.SecurityService;
 import passwordmanager.security.UserSession;
-import passwordmanager.utility.ConsoleUtil;
+import passwordmanager.utility.ConsoleUtilImpl;
 
 import javax.crypto.SecretKey;
 import javax.security.sasl.AuthenticationException;
@@ -19,7 +19,7 @@ import java.util.Scanner;
 public class AuthenticationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
-    private static final ConsoleUtil consoleUtil = new ConsoleUtil();
+    private static final ConsoleUtilImpl consoleUtil = new ConsoleUtilImpl();
     private final DatabaseService databaseService;
     private final SecurityService securityService;
     private final CryptoService cryptoService;
@@ -42,43 +42,43 @@ public class AuthenticationService {
     }
 
     public String initialDialogue(){
-        System.out.println(HEADER_BORDER);
-        System.out.println("***        PasswordManager        ***");
-        System.out.println(HEADER_BORDER);
-        System.out.println(" ");
-        System.out.println("Please select from the below options:");
-        System.out.println("1. Login");
-        System.out.println("2. Register");
-        System.out.println("3. Exit");
+        consoleUtil.printLine(HEADER_BORDER);
+        consoleUtil.printLine("***        PasswordManager        ***");
+        consoleUtil.printLine(HEADER_BORDER);
+        consoleUtil.printLine(" ");
+        consoleUtil.printLine("Please select from the below options:");
+        consoleUtil.printLine("1. Login");
+        consoleUtil.printLine("2. Register");
+        consoleUtil.printLine("3. Exit");
 
         return scanner.next();
     }
 
     public String registeredUserDialogue(){
-        System.out.println(HEADER_BORDER);
-        System.out.println("***        PasswordManager        ***");
-        System.out.println(HEADER_BORDER);
-        System.out.println(" ");
-        System.out.println("Please select from the below options:");
-        System.out.println("1. Add new site");
-        System.out.println("2. Retrieve a password");
-        System.out.println("3. Update a password");
-        System.out.println("4. List current sites");
-        System.out.println("5. Delete a site");
-        System.out.println("6. Exit");
+        consoleUtil.printLine(HEADER_BORDER);
+        consoleUtil.printLine("***        PasswordManager        ***");
+        consoleUtil.printLine(HEADER_BORDER);
+        consoleUtil.printLine(" ");
+        consoleUtil.printLine("Please select from the below options:");
+        consoleUtil.printLine("1. Add new site");
+        consoleUtil.printLine("2. Retrieve a password");
+        consoleUtil.printLine("3. Update a password");
+        consoleUtil.printLine("4. List current sites");
+        consoleUtil.printLine("5. Delete a site");
+        consoleUtil.printLine("6. Exit");
         return scanner.next();
     }
 
     public UserSession login() {
-        System.out.println("\nPlease enter your username:");
+        consoleUtil.printLine("\nPlease enter your username:");
         String username = scanner.next();
 
-        System.out.println("\nPlease enter your password:");
+        consoleUtil.printLine("\nPlease enter your password:");
         String password;
         if (console != null) {
             char[] chars = console.readPassword();
             if (chars == null) {
-                System.out.println("No password entered.");
+                consoleUtil.printLine("No password entered.");
                 return null;
             }
             password = new String(chars);
@@ -97,11 +97,11 @@ public class AuthenticationService {
                 throw new AuthenticationException("Decryption did not match expected value.");
             }
 
-            System.out.println("Login successful!");
+            consoleUtil.printLine("Login successful!");
             return new UserSession(username, userKey);
 
         } catch (AuthenticationException e) {
-            System.out.println("Invalid username or password.");
+            consoleUtil.printLine("Invalid username or password.");
             LOGGER.warn("Login failed for '{}': {}", username, e.getMessage());
         } catch (Exception e) {
             LOGGER.error("Unexpected login error for '{}': {}", username, e.getMessage());
@@ -111,7 +111,7 @@ public class AuthenticationService {
 
 
     public void registerUser() {
-        System.out.println(" ");
+        consoleUtil.printLine(" ");
         String username = checkUsernameAvailability();
         String password = readPasswords(); // ← capture the password here
         String salt = SecurityService.generateSalt();
@@ -134,7 +134,7 @@ public class AuthenticationService {
 
     protected String checkUsernameAvailability() {
         while (true){
-            System.out.println("Please enter a username:");
+            consoleUtil.printLine("Please enter a username:");
             String username = scanner.next();
             boolean exists = false;
             try {
@@ -145,7 +145,7 @@ public class AuthenticationService {
             if(!exists){
                 return username;
             }
-            System.out.println("Username is not available! Please try again.");
+            consoleUtil.printLine("Username is not available! Please try again.");
         }
     }
 
@@ -154,19 +154,19 @@ public class AuthenticationService {
         String password2;
 
         while (true) {
-            System.out.println("Please enter a password:");
+            consoleUtil.printLine("Please enter a password:");
             password1 = scanner.next();
 
-            System.out.println("Please confirm your password:");
+            consoleUtil.printLine("Please confirm your password:");
             password2 = scanner.next();
 
             if (password1.equals(password2)) {
                 break;
             } else {
-                System.out.println("Passwords do not match. Try again.");
+                consoleUtil.printLine("Passwords do not match. Try again.");
             }
         }
-        System.out.println("Password accepted.");
+        consoleUtil.printLine("Password accepted.");
         return password1;
     }
 }

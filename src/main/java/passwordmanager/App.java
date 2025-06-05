@@ -6,7 +6,7 @@ import passwordmanager.authentication.AuthenticationService;
 import passwordmanager.database.DatabaseService;
 import passwordmanager.security.UserSession;
 import passwordmanager.user.UserActionService;
-import passwordmanager.utility.ConsoleUtil;
+import passwordmanager.utility.ConsoleUtilImpl;
 import passwordmanager.utility.LoggedInMenuOptionEnum;
 import passwordmanager.utility.MenuOptionEnum;
 
@@ -21,9 +21,9 @@ public class App {
     private final AuthenticationService authenticationService;
     private final UserActionService userActionService;
     private final DatabaseService databaseService;
-    private final ConsoleUtil consoleUtil;
+    private final ConsoleUtilImpl consoleUtil;
 
-    public App(AuthenticationService authService, DatabaseService dbService, ConsoleUtil consoleUtil, UserActionService userActionService) {
+    public App(AuthenticationService authService, DatabaseService dbService, ConsoleUtilImpl consoleUtil, UserActionService userActionService) {
         this.authenticationService = authService;
         this.databaseService = dbService;
         this.consoleUtil = consoleUtil;
@@ -46,8 +46,8 @@ public class App {
                         consoleUtil.clearConsole();
                         showLoggedInMenu(userSession);
                     } else {
-                        System.out.println("Login Failed. Please try again");
-                        System.out.println("Press enter to return and try again");
+                        consoleUtil.printLine("Login Failed. Please try again");
+                        consoleUtil.printLine("Press enter to return and try again");
                         new Scanner(System.in).nextLine();
                     }
                 }
@@ -67,7 +67,6 @@ public class App {
             consoleUtil.clearConsole();
             String input = authenticationService.registeredUserDialogue();
             LoggedInMenuOptionEnum option = LoggedInMenuOptionEnum.fromInput(input);
-            System.out.println(option);
             switch (Objects.requireNonNull(option)) {
                 case ADD -> {
                     consoleUtil.clearConsole();
@@ -76,16 +75,16 @@ public class App {
                 case RETRIEVE -> {
                     String sitePassword = userActionService.getUserPassword(userSession);
                     consoleUtil.clearConsole();
-                    System.out.println("Your password is: " + sitePassword);
+                    consoleUtil.printLine("Your password is: " + sitePassword);
                     System.out.print("Press Enter to return to the menu...");
                     new Scanner(System.in).nextLine();
                 }
-                case UPDATE -> System.out.println();
+                case UPDATE -> consoleUtil.printLine("");
                 case LIST -> {
                     userActionService.listAllUserSites(userSession);
                     new Scanner(System.in).nextLine();
                 }
-                case DELETE -> System.out.println("HERE");
+                case DELETE -> consoleUtil.printLine("HERE");
                 case EXIT -> {
                     consoleUtil.clearConsole();
                     return;
@@ -96,7 +95,8 @@ public class App {
     }
 
     public static void main(String[] args) throws SQLException {
-        App app = new App(new AuthenticationService(), new DatabaseService(), new ConsoleUtil(), new UserActionService());
+        ConsoleUtilImpl consoleUtil = new ConsoleUtilImpl();
+        App app = new App(new AuthenticationService(), new DatabaseService(), new ConsoleUtilImpl(), new UserActionService(consoleUtil));
         app.run();
     }
 }
