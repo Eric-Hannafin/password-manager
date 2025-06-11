@@ -77,12 +77,12 @@ public class App {
                     consoleUtil.clearConsole();
                     consoleUtil.printLine("Your password is: " + sitePassword);
                     System.out.print("Press Enter to return to the menu...");
-                    new Scanner(System.in).nextLine();
+                    consoleUtil.readLine();
                 }
                 case UPDATE -> consoleUtil.printLine("");
                 case LIST -> {
                     userActionService.listAllUserSites(userSession);
-                    new Scanner(System.in).nextLine();
+                    consoleUtil.readLine();
                 }
                 case DELETE -> consoleUtil.printLine("HERE");
                 case EXIT -> {

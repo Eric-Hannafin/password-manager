@@ -43,20 +43,20 @@ public class AuthenticationService {
 
     public String initialDialogue(){
         consoleUtil.printLine(HEADER_BORDER);
-        consoleUtil.printLine("***        PasswordManager        ***");
+        consoleUtil.printLine("**        PasswordManager         **");
         consoleUtil.printLine(HEADER_BORDER);
         consoleUtil.printLine(" ");
         consoleUtil.printLine("Please select from the below options:");
         consoleUtil.printLine("1. Login");
         consoleUtil.printLine("2. Register");
         consoleUtil.printLine("3. Exit");
-
+        consoleUtil.printLine(" ");
         return scanner.next();
     }
 
     public String registeredUserDialogue(){
         consoleUtil.printLine(HEADER_BORDER);
-        consoleUtil.printLine("***        PasswordManager        ***");
+        consoleUtil.printLine("**        PasswordManager         **");
         consoleUtil.printLine(HEADER_BORDER);
         consoleUtil.printLine(" ");
         consoleUtil.printLine("Please select from the below options:");
@@ -66,6 +66,7 @@ public class AuthenticationService {
         consoleUtil.printLine("4. List current sites");
         consoleUtil.printLine("5. Delete a site");
         consoleUtil.printLine("6. Exit");
+        consoleUtil.printLine(" ");
         return scanner.next();
     }
 

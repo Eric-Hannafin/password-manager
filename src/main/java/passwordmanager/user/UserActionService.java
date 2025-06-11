@@ -90,13 +90,15 @@ public class UserActionService {
             List<String> sites = databaseService.listAllUserSites(userSession);
             int i = 1;
             for (String site : sites) {
+                if(i == 1){
+                    consoleUtil.printLine("");
+                }
                 consoleUtil.printLine(i + ": " + site);
                 i++;
             }
+            consoleUtil.printLine("Press Enter to return to the menu...");
         } catch (SQLException e) {
             LOGGER.error("Failed to retrieve user sites", e);
         }
     }
-
-
 }
